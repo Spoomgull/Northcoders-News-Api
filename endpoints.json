@@ -25,5 +25,19 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an array of specified article",
+    "queries": ["number"],
+    "exampleResponse": {
+      "article": {
+        "article_id": "2",
+        "title": "Sony Vaio; or, The Laptop",
+        "topic": "mitch",
+        "body": "Text from the article..",
+        "created_at": "2020-10-16T05:03:00.000Z",
+        "votes": 0,
+        "article_img_url":"https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700" }
+    }
   }
 }

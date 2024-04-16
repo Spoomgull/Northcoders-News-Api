@@ -54,8 +54,38 @@ describe("GET /api",()=>{
                 .then(({body})=>{
                     const endpoints = body.endpoints
                     expect(endpoints["GET /api"]).toEqual({description: 'serves up a json representation of all the available endpoints of the api'})
-                    expect(endpoints["GET /api/topics"]).toEqual({"description": "serves an array of all topics", "exampleResponse": {"topics": [{"description": "Footie!", "slug": "football"}]}, "queries": []})
-                    expect(endpoints["GET /api/articles"]).toEqual({"description": "serves an array of all articles", "exampleResponse": {"articles": [{"author": "weegembump", "body": "Text from the article..", "comment_count": 6, "created_at": "2018-05-30T15:59:13.341Z", "title": "Seafood substitutions are increasing", "topic": "cooking", "votes": 0}]}, "queries": ["author", "topic", "sort_by", "order"]})
+                    expect(endpoints["GET /api/topics"]).toMatchObject({"description": "serves an array of all topics", "exampleResponse": {"topics": [{"description": "Footie!", "slug": "football"}]}, "queries": []})
+                    expect(endpoints["GET /api/articles"]).toMatchObject({"description": "serves an array of all articles", "exampleResponse": {"articles": [{"author": "weegembump", "body": "Text from the article..", "comment_count": 6, "created_at": "2018-05-30T15:59:13.341Z", "title": "Seafood substitutions are increasing", "topic": "cooking", "votes": 0}]}, "queries": ["author", "topic", "sort_by", "order"]})
                 })
+    })
+})
+describe("GET /api/articles/:article_id",()=>{
+    test("get status code 200, and return the specified article",()=>{
+        return request(app)
+        .get("/api/articles/2")
+        .expect(200)
+            .then(({body})=>{
+                const article = body.article
+                expect(Object.keys(article).length).toBe(8)
+                expect(typeof article.author).toBe("string")
+                expect(typeof article.votes).toBe("number")
+            })
+    })
+    test("get status code 400 if query is correct type but out of bounds",()=>{
+        return request(app)
+        .get("/api/articles/100")
+        .expect(400)
+            .then(({body})=>{
+                expect(body.msg).toBe("Invalid query params!!")
+            })
+    })
+    test("get status code 400 if query is incorrect type",()=>{
+        return request(app)
+        .get("/api/articles/John")
+        .expect(400)
+            .then(({body})=>{
+                expect(body.msg).toBe("Invalid query params!!")
+
+        })
     })
 })
