@@ -13,3 +13,7 @@ exports.readEndpoints = ()=>{
     return fs.readFile(`./endpoints.json`,"utf-8").then((data)=>{return data})
 }
 
+exports.selectAllArticles = (id)=>{
+    return db.query(`SELECT * FROM articles WHERE article_id = $1`,[id])
+}
+
