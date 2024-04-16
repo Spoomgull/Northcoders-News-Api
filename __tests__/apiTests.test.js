@@ -3,7 +3,7 @@ const app = require("../app/app.js")
 const db = require("../db/connection.js")
 const seed = require("../db/seeds/seed.js")
 const data = require("../db/data/test-data/index.js")
-
+require("jest-sorted")
 
 
 afterAll(()=>{
@@ -24,7 +24,6 @@ describe("GET /*",()=>{
             })
     })
 })
-
 
 describe("GET /api/topics",()=>{
     test("get status code 200, and return all from the topic table",()=>{
@@ -55,10 +54,11 @@ describe("GET /api",()=>{
                     const endpoints = body.endpoints
                     expect(endpoints["GET /api"]).toEqual({description: 'serves up a json representation of all the available endpoints of the api'})
                     expect(endpoints["GET /api/topics"]).toMatchObject({"description": "serves an array of all topics", "exampleResponse": {"topics": [{"description": "Footie!", "slug": "football"}]}, "queries": []})
-                    expect(endpoints["GET /api/articles"]).toMatchObject({"description": "serves an array of all articles", "exampleResponse": {"articles": [{"author": "weegembump", "body": "Text from the article..", "comment_count": 6, "created_at": "2018-05-30T15:59:13.341Z", "title": "Seafood substitutions are increasing", "topic": "cooking", "votes": 0}]}, "queries": ["author", "topic", "sort_by", "order"]})
+                    expect(endpoints["GET /api/articles"]).toMatchObject({"description": "serves an array of all articles", "exampleResponse": {"articles": [{"author": "weegembump", "comment_count": 6, "created_at": "2018-05-30T15:59:13.341Z", "title": "Seafood substitutions are increasing", "topic": "cooking", "votes": 0}]}, "queries": ["author", "topic", "sort_by", "order"]})
                 })
     })
 })
+
 describe("GET /api/articles/:article_id",()=>{
     test("get status code 200, and return the specified article",()=>{
         return request(app)
@@ -86,6 +86,27 @@ describe("GET /api/articles/:article_id",()=>{
             .then(({body})=>{
                 expect(body.msg).toBe("Invalid query params!!")
 
+        })
+    })
+})
+
+describe("GET /api/articles",()=>{
+    test("get status code 200, and all the articles in an array with comment_count and ordered by date descending",()=>{
+        return request(app)
+        .get("/api/articles")
+        .expect(200)
+            .then(({body})=>{
+                const articles=body.articles
+                expect(typeof articles).toBe("object")
+                expect(articles).toBeSortedBy("created_at",{descending: true})
+                articles.forEach((article)=>{
+                    expect(Object.keys(article)).toEqual(["article_id","title","topic","author","created_at","votes","article_img_url","comment_count"])
+                    expect(typeof article.author).toBe("string")
+                    expect(typeof article.votes).toBe("number")
+                    expect(article.body).toBe(undefined)
+                    expect(Object.keys(article).length).toBe(8)
+                    expect(typeof article.comment_count).toBe("string")
+                })
         })
     })
 })

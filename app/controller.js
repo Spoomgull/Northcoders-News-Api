@@ -1,4 +1,4 @@
-const {selectAllTopics, readEndpoints, selectAllArticles} = require("./model.js")
+const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles} = require("./model.js")
 
 
 
@@ -13,7 +13,8 @@ exports.getTopics = (req,res,next) =>{
         return res.status(200).send({topics:rows})
     })
 }
-exports.getEndpoints = (req,res,next)=>{
+
+exports.getEndpoints = (req,res,next) =>{
 
     readEndpoints().then((result)=>{
 
@@ -27,7 +28,7 @@ exports.getArticles = (req,res,next) =>{
 
     const articleId = req.params.article_id
 
-    selectAllArticles(articleId).then(({rows})=>{
+    selectSpecifiedArticle(articleId).then(({rows})=>{
         if(rows.length===0){return res.status(400).send({msg:"Invalid query params!!"})}
         
         return res.status(200).send({article:rows[0]})
@@ -36,5 +37,13 @@ exports.getArticles = (req,res,next) =>{
         if(code === "22P02"){
             return res.status(400).send({msg:"Invalid query params!!"})
         }else{code}
+    })
+}
+
+exports.getAllArticles = (req,res,nest) =>{
+
+    selectAllArticles().then(({rows})=>{
+
+        return res.status(200).send({articles:rows})
     })
 }
