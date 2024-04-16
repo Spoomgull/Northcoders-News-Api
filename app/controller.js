@@ -1,4 +1,4 @@
-const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles} = require("./model.js")
+const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments} = require("./model.js")
 
 
 
@@ -40,10 +40,27 @@ exports.getArticles = (req,res,next) =>{
     })
 }
 
-exports.getAllArticles = (req,res,nest) =>{
+exports.getAllArticles = (req,res,next) =>{
 
     selectAllArticles().then(({rows})=>{
 
         return res.status(200).send({articles:rows})
+    })
+}
+
+exports.getComments = (req,res,next) =>{
+
+    const articleId = req.params.article_id
+
+    selectSpecifiedComments(articleId).then(({rows})=>{
+        const comments = rows
+ 
+        if(rows.length===0){return res.status(404).send({msg:"No comments!!"})}
+      
+        return res.status(200).send({comments:rows})
+
+    }).catch(({code})=>{if(code==="22P02"){
+        return res.status(400).send({msg:"Invalid query params!!"})
+        }else{code}
     })
 }

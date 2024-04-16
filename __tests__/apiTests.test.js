@@ -110,3 +110,58 @@ describe("GET /api/articles",()=>{
         })
     })
 })
+
+describe("GET /api/articles/:article_id/comments",()=>{
+    test("get status code 200, and return all the comments for the specified article",()=>{
+        return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+            .then(({body})=>{
+                const comments = body.comments
+                expect(comments.length).toBeGreaterThan(0)
+                comments.forEach((comment)=>{
+                    const commentParts = Object.values(comment)
+                    expect(Object.keys(comment)).toMatchObject(["comment_id","body","article_id","author","votes","created_at"])
+                    expect(typeof commentParts[0]).toBe("number")
+                    expect(typeof commentParts[1]).toBe("string")
+                    expect(typeof commentParts[2]).toBe("number")
+                    expect(typeof commentParts[3]).toBe("string")
+                    expect(typeof commentParts[4]).toBe("number")
+                    expect(typeof commentParts[5]).toBe("string")
+                })
+            })
+        })
+    test("expect the returned values to be sorted with the most recent comments first",()=>{
+        return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+            .then(({body})=>{
+                const comments = body.comments
+                expect(comments).toBeSortedBy("created_at",{descending:true})
+            })
+        })
+    test("get status code 200, and return a message if there are no comments",()=>{
+        return request(app)
+        .get("/api/articles/2/comments")
+        .expect(404)
+            .then(({body})=>{
+                expect(body.msg).toBe("No comments!!")
+            })
+    })
+    test("get status code 404, and return an error message if the parameter is a valid type but a non-existant article_id",()=>{
+        return request(app)
+        .get("/api/articles/100/comments")
+        .expect(404)
+            .then(({body})=>{
+                expect(body.msg).toBe("No comments!!")
+            })
+    })
+    test("get status code 400, and return an error message if the parameter is an invalid type",()=>{
+        return request(app)
+        .get("/api/articles/John/comments")
+        .expect(400)
+            .then(({body})=>{
+                expect(body.msg).toBe("Invalid query params!!")
+            })
+    })
+})
