@@ -33,9 +33,9 @@ exports.getArticles = (req,res,next) =>{
         
         return res.status(200).send({article:rows[0]})
     
-    }).catch(({code})=>{
-        if(code){
-        next(code)}
+    }).catch((err)=>{
+        if(err){
+        next(err)}
     })
 }
 
@@ -53,14 +53,13 @@ exports.getComments = (req,res,next) =>{
 
     selectSpecifiedComments(articleId).then(({rows})=>{
         const comments = rows
- 
         if(rows.length===0){return res.status(404).send({msg:"No comments!!"})}
       
         return res.status(200).send({comments:rows})
 
-    }).catch(({code})=>{
-        if(code){
-        next(code)}
+    }).catch((err)=>{
+        if(err){
+        next(err)}
     })
 }
 
@@ -70,10 +69,9 @@ exports.postComment = (req,res,next) =>{
     
     updateComments(comment,articleId).then(({rows})=>{
         return res.status(201).send({comment:rows})
-    }).catch(({code})=>{
-        if(code === undefined){return res.status(400).send({msg:"Invalid username"})}
-        if(code){
-            next(code)
+    }).catch((err)=>{
+        if(err){
+            next(err)
         }
     })
 }
