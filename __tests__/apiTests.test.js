@@ -175,6 +175,7 @@ describe("POST /api/articles/:article_id/comments",()=>{
             .send(comment)
             .expect(201)
                 .then(({body})=>{
+                    console.log(body)
                     const postedComment = body.comment
                     expect(postedComment).toMatchObject([{"article_id": 2, "author": "butter_bridge", "body": "This article is pretty great! :)", "comment_id": 19, "votes": 0}])
                     expect(typeof postedComment[0].created_at).toBe("string")
