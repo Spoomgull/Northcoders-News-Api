@@ -168,20 +168,18 @@ describe("GET /api/articles/:article_id/comments",()=>{
 
 describe("POST /api/articles/:article_id/comments",()=>{
     test("get status code 200 and responds with the posted comment",()=>{
-        const comment = {username: "jonny",body: "This article is pretty great! :)"}
+        const comment = {username: "butter_bridge",body: "This article is pretty great! :)"}
         return request(app)
 
             .post("/api/articles/2/comments")
             .send(comment)
             .expect(201)
                 .then(({body})=>{
-                    console.log(body)
                     const postedComment = body.comment
-                    expect(postedComment).toMatchObject([{"article_id": 2, "author": "butter_bridge", "body": "This article is pretty great! :)", "comment_id": 19, "votes": 0}])
-                    expect(typeof postedComment[0].created_at).toBe("string")
+                    expect(postedComment).toMatchObject([{"article_id": 2, "author": "butter_bridge", "body": "This article is pretty great! :)", "comment_id": 19, "votes": 0, "created_at": expect.any(String)}])
                 })
     })
-    test("get status code 400, when given an incorrect comment",()=>{
+    test("get status code 400, when given an incorrect username",()=>{
         const comment = {username:"john", body:"this is a comment"}
         return request(app)
         
@@ -190,11 +188,11 @@ describe("POST /api/articles/:article_id/comments",()=>{
             .expect(400)
                 .then(({body})=>{
                     const err = body.msg
-                    expect(err).toBe("Invalid username")
+                    expect(err).toBe("Invalid query params!!")
                 })
     })
     test("get status code 400, when given an incorrect article id",()=>{
-        const comment = {username:"jonny",body:"this is a comment"}
+        const comment = {username:"butter_bridge",body:"this is a comment"}
         return request(app)
 
             .post("/api/articles/100/comments")
@@ -202,7 +200,7 @@ describe("POST /api/articles/:article_id/comments",()=>{
             .expect(400)
                 .then(({body})=>{
                     const err = body.msg
-                    expect(err).toBe("Invalid article id!!")
+                    expect(err).toBe("Invalid query params!!")
                 })
     })
 })

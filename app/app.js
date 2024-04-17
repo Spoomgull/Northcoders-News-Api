@@ -19,11 +19,15 @@ app.get("/api/articles/:article_id/comments",getComments)
 app.post("/api/articles/:article_id/comments",postComment)
 
 app.use((err, req, res, next) => {
-  if(err==="22P02"){return res.status(400).send({msg:"Invalid query params!!"})}
+  if(err.code==="22P02"){return res.status(400).send({msg:"Invalid query params!!"})}
   next(err)
 })
 app.use((err,req,res,nest) => {
-  if(err==="23503"){return res.status(400).send({msg:"Invalid article id!!"})}
+  if(err.code==="23503"){return res.status(400).send({msg:"Invalid query params!!"})}
+  next(err)
+})
+app.use((err,req,res,next)=>{
+  return res.status(400).send({msg:"Invalid query params!!"})
 })
 
 
