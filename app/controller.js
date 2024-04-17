@@ -1,4 +1,4 @@
-const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments} = require("./model.js")
+const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments, updateComments} = require("./model.js")
 
 
 
@@ -34,16 +34,15 @@ exports.getArticles = (req,res,next) =>{
         return res.status(200).send({article:rows[0]})
     
     }).catch(({code})=>{
-        if(code === "22P02"){
-            return res.status(400).send({msg:"Invalid query params!!"})
-        }else{code}
+        if(code){
+        next(code)}
     })
 }
 
 exports.getAllArticles = (req,res,next) =>{
 
     selectAllArticles().then(({rows})=>{
-
+        rows.forEach((article)=>{article.comment_count=Number(article.comment_count)})
         return res.status(200).send({articles:rows})
     })
 }
@@ -59,8 +58,22 @@ exports.getComments = (req,res,next) =>{
       
         return res.status(200).send({comments:rows})
 
-    }).catch(({code})=>{if(code==="22P02"){
-        return res.status(400).send({msg:"Invalid query params!!"})
-        }else{code}
+    }).catch(({code})=>{
+        if(code){
+        next(code)}
+    })
+}
+
+exports.postComment = (req,res,next) =>{
+    const comment = req.body
+    const articleId = req.params
+    
+    updateComments(comment,articleId).then(({rows})=>{
+        return res.status(201).send({comment:rows})
+    }).catch(({code})=>{
+        if(code === undefined){return res.status(400).send({msg:"Invalid username"})}
+        if(code){
+            next(code)
+        }
     })
 }

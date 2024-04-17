@@ -105,7 +105,7 @@ describe("GET /api/articles",()=>{
                     expect(typeof article.votes).toBe("number")
                     expect(article.body).toBe(undefined)
                     expect(Object.keys(article).length).toBe(8)
-                    expect(typeof article.comment_count).toBe("string")
+                    expect(typeof article.comment_count).toBe("number")
                 })
         })
     })
@@ -163,5 +163,45 @@ describe("GET /api/articles/:article_id/comments",()=>{
             .then(({body})=>{
                 expect(body.msg).toBe("Invalid query params!!")
             })
+    })
+})
+
+describe("POST /api/articles/:article_id/comments",()=>{
+    test("get status code 200 and responds with the posted comment",()=>{
+        const comment = {username: "jonny",body: "This article is pretty great! :)"}
+        return request(app)
+
+            .post("/api/articles/2/comments")
+            .send(comment)
+            .expect(201)
+                .then(({body})=>{
+                    const postedComment = body.comment
+                    expect(postedComment).toMatchObject([{"article_id": 2, "author": "butter_bridge", "body": "This article is pretty great! :)", "comment_id": 19, "votes": 0}])
+                    expect(typeof postedComment[0].created_at).toBe("string")
+                })
+    })
+    test("get status code 400, when given an incorrect comment",()=>{
+        const comment = {username:"john", body:"this is a comment"}
+        return request(app)
+        
+            .post("/api/articles/2/comments")
+            .send(comment)
+            .expect(400)
+                .then(({body})=>{
+                    const err = body.msg
+                    expect(err).toBe("Invalid username")
+                })
+    })
+    test("get status code 400, when given an incorrect article id",()=>{
+        const comment = {username:"jonny",body:"this is a comment"}
+        return request(app)
+
+            .post("/api/articles/100/comments")
+            .send(comment)
+            .expect(400)
+                .then(({body})=>{
+                    const err = body.msg
+                    expect(err).toBe("Invalid article id!!")
+                })
     })
 })
