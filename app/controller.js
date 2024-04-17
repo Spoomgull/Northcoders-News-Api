@@ -1,4 +1,4 @@
-const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments, updateComments} = require("./model.js")
+const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments, updateComments, updateArticle} = require("./model.js")
 
 
 
@@ -69,6 +69,20 @@ exports.postComment = (req,res,next) =>{
     
     updateComments(comment,articleId).then(({rows})=>{
         return res.status(201).send({comment:rows})
+    }).catch((err)=>{
+        if(err){
+            next(err)
+        }
+    })
+}
+
+exports.patchArticle = (req,res,next) =>{
+    const {article_id} = req.params
+    const {inc_votes} = req.body
+
+    updateArticle(article_id,inc_votes).then(({rows})=>{
+        if(rows.length === 0){return res.status(400).send({msg:"Invalid range for article_id!!"})}
+        return res.status(200).send({article:rows})
     }).catch((err)=>{
         if(err){
             next(err)

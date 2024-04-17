@@ -167,7 +167,7 @@ describe("GET /api/articles/:article_id/comments",()=>{
 })
 
 describe("POST /api/articles/:article_id/comments",()=>{
-    test("get status code 200 and responds with the posted comment",()=>{
+    test("get status code 201 and responds with the posted comment",()=>{
         const comment = {username: "butter_bridge",body: "This article is pretty great! :)"}
         return request(app)
 
@@ -202,5 +202,76 @@ describe("POST /api/articles/:article_id/comments",()=>{
                     const err = body.msg
                     expect(err).toBe("Invalid query params!!")
                 })
+    })
+})
+
+describe("PATCH /api/articles/:article_id",()=>{
+    test("get status code 200, and return the updated article with the new votes value",()=>{
+        const newVote = 10
+        const patch = {inc_votes: newVote}
+        return request(app)
+        .patch("/api/articles/3")
+        .send(patch)
+        .expect(200)
+            .then(({body})=>{
+                const article = body.article[0]
+                expect(article).toMatchObject({article_id: 3,
+                article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                author: "icellusedkars",
+                body: "some gifs",
+                created_at: "2020-11-03T09:12:00.000Z",
+                title: "Eight pug gifs that remind me of mitch",
+                topic: "mitch",
+                votes : 10})
+
+            })
+    })
+    test("get status code 200, and return the updated article when inc_votes is a negative number",()=>{
+        const newVote = -10
+        const patch = {inc_votes: newVote}
+        return request(app)
+        .patch("/api/articles/2")
+        .send(patch)
+        .expect(200)
+            .then(({body})=>{
+                const article = body.article[0]
+                expect(article.votes).toBe(-10)
+            })
+    })
+    test("get status code 400, when newVote is incorrect type",()=>{
+        const newVote = "hello"
+        const patch = {inc_votes: newVote}
+        return request(app)
+        .patch("/api/articles/1")
+        .send(patch)
+        .expect(400)
+            .then(({body})=>{
+                const {msg} = body
+                expect(msg).toBe("Invalid query params!!")
+            })
+    })
+    test("get status code 400, when article_id is correct type but invalid range",()=>{
+        const newVote = 10
+        const patch = {inc_votes: newVote}
+        return request(app)
+        .patch("/api/articles/100")
+        .send(patch)
+        .expect(400)
+            .then(({body})=>{
+                const {msg} = body
+                expect(msg).toBe("Invalid range for article_id!!")
+            })
+    })
+    test("get status code 400, when article_id is the incorrect type",()=>{
+        const newVote = 10
+        const patch = {inc_votes: newVote}
+        return request(app)
+        .patch("/api/articles/John")
+        .send(patch)
+        .expect(400)
+            .then(({body})=>{
+                const {msg} = body
+                expect(msg).toBe
+            })
     })
 })
