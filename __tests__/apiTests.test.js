@@ -319,7 +319,7 @@ describe("GET /api/users",()=>{
 describe("GET /api/articles?topicFilter",()=>{
     test("get status code 200, and return all the articles with the specific topic filter",()=>{
         return request(app)
-        .get("/api/articles?topicFilter=mitch")
+        .get("/api/articles?topic=mitch")
         .expect(200)
             .then(({body})=>{
                 const {articles} = body
@@ -331,7 +331,7 @@ describe("GET /api/articles?topicFilter",()=>{
     })
     test("get status code 400 if there are no topics with the topicFilter value",()=>{
         return request(app)
-        .get("/api/articles?topicFilter=paper")
+        .get("/api/articles?topic=paper")
         .expect(404)
             .then(({body})=>{
                 expect(body.msg).toBe("Sorry can't find that!!")
@@ -339,7 +339,7 @@ describe("GET /api/articles?topicFilter",()=>{
     })
     test("get status code 404 if the filter has the wrong name",()=>{
         return request(app)
-        .get("/api/articles?tipocFeltir=mitch")
+        .get("/api/articles?tipoc=mitch")
         .expect(404)
             .then(({body})=>{
                 expect(body.msg).toBe("Sorry can't find that!!")

@@ -23,8 +23,8 @@ exports.selectAllArticles = (query)=>{
 
     const queryVar = []
     if(Object.keys(query).length>0){
-        if(query.topicFilter===undefined){throw err}
-        queryVar.push(query.topicFilter)
+        if(query.topic===undefined){throw err}
+        queryVar.push(query.topic)
         querystr+= `WHERE topic = $${queryVar.length} `
     }
     querystr+= `GROUP BY articles.article_id ORDER BY articles.created_at DESC`
