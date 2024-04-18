@@ -2,7 +2,7 @@ const express = require("express")
 
 const app = express()
 
-const {getTopics, getEndpoints, getArticles, getAllArticles, getComments, postComment, patchArticle} = require("./controller")
+const {getTopics, getEndpoints, getArticles, getAllArticles, getComments, postComment, patchArticle, deleteComment} = require("./controller")
 
 app.use(express.json())
 
@@ -20,10 +20,12 @@ app.post("/api/articles/:article_id/comments",postComment)
 
 app.patch("/api/articles/:article_id",patchArticle)
 
+app.delete("/api/comments/:comment_id",deleteComment)
+
 
 
 app.use((err, req, res, next) => {
-  if(err.code==="22P02"){return res.status(400).send({msg:"Invalid query params!!"})}
+  if(err.code==="22P02"){return res.status(400).send({msg:"Invalid query type!!"})}
   next(err)
 })
 app.use((err,req,res,nest) => {

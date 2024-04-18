@@ -1,4 +1,4 @@
-const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments, updateComments, updateArticle} = require("./model.js")
+const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments, updateComments, updateArticle, deleteFromComments} = require("./model.js")
 
 
 
@@ -89,3 +89,18 @@ exports.patchArticle = (req,res,next) =>{
         }
     })
 }
+
+exports.deleteComment = (req,res,next) =>{
+    const {comment_id} = req.params
+
+    deleteFromComments(comment_id).then(({rows})=>{
+        if(rows.length===0){next()}
+        
+        return res.status(204).send()
+    }).catch((err)=>{
+        if(err){
+            next(err)
+        }
+    })
+    }
+
