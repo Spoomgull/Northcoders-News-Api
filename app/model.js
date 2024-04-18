@@ -14,7 +14,10 @@ exports.readEndpoints = ()=>{
 }
 
 exports.selectSpecifiedArticle = (id)=>{
-    return db.query(`SELECT * FROM articles WHERE article_id = $1`,[id])
+        return db.query(`SELECT COUNT(*) AS comment_count FROM comments WHERE article_id = $1`,[id]).then(({rows})=>{
+         const {comment_count} = rows[0]
+        return db.query(`SELECT *, $1 AS comment_count FROM articles WHERE article_id = $2`,[comment_count,id])
+          })
 }
 
 exports.selectAllArticles = (query)=>{    
