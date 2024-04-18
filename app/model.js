@@ -51,3 +51,7 @@ exports.updateArticle = (id, inc_votes)=>{
 exports.deleteFromComments = (id)=>{
     return db.query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`,[id])
 }
+
+exports.selectAllUsers = ()=>{
+    return db.query(`SELECT * FROM users`)
+}

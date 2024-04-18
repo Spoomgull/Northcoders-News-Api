@@ -1,4 +1,4 @@
-const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments, updateComments, updateArticle, deleteFromComments} = require("./model.js")
+const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles, selectSpecifiedComments, updateComments, updateArticle, deleteFromComments,selectAllUsers} = require("./model.js")
 
 
 
@@ -29,13 +29,12 @@ exports.getArticles = (req,res,next) =>{
     const articleId = req.params.article_id
 
     selectSpecifiedArticle(articleId).then(({rows})=>{
-        if(rows.length===0){return res.status(400).send({msg:"Invalid query params!!"})}
+        if(rows.length===0){throw err}
         
         return res.status(200).send({article:rows[0]})
     
     }).catch((err)=>{
-        if(err){
-        next(err)}
+        next(err)
     })
 }
 
@@ -58,8 +57,7 @@ exports.getComments = (req,res,next) =>{
         return res.status(200).send({comments:rows})
 
     }).catch((err)=>{
-        if(err){
-        next(err)}
+        next(err)
     })
 }
 
@@ -70,10 +68,9 @@ exports.postComment = (req,res,next) =>{
     updateComments(comment,articleId).then(({rows})=>{
         return res.status(201).send({comment:rows})
     }).catch((err)=>{
-        if(err){
             next(err)
         }
-    })
+    )
 }
 
 exports.patchArticle = (req,res,next) =>{
@@ -81,26 +78,28 @@ exports.patchArticle = (req,res,next) =>{
     const {inc_votes} = req.body
 
     updateArticle(article_id,inc_votes).then(({rows})=>{
-        if(rows.length === 0){return res.status(400).send({msg:"Invalid range for article_id!!"})}
+        if(rows.length === 0){throw err}
         return res.status(200).send({article:rows})
     }).catch((err)=>{
-        if(err){
             next(err)
         }
-    })
+    )
 }
 
 exports.deleteComment = (req,res,next) =>{
     const {comment_id} = req.params
 
     deleteFromComments(comment_id).then(({rows})=>{
-        if(rows.length===0){next()}
+        if(rows.length===0){throw err}
         
         return res.status(204).send()
     }).catch((err)=>{
-        if(err){
             next(err)
-        }
     })
     }
 
+exports.getUsers = (req,res,next) =>{
+    selectAllUsers().then(({rows})=>{
+        return res.status(200).send({users:rows})
+    })
+}

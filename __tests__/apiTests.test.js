@@ -71,12 +71,12 @@ describe("GET /api/articles/:article_id",()=>{
                 expect(typeof article.votes).toBe("number")
             })
     })
-    test("get status code 400 if query is correct type but out of bounds",()=>{
+    test("get status code 404 if query is correct type but invalid range",()=>{
         return request(app)
         .get("/api/articles/100")
-        .expect(400)
+        .expect(404)
             .then(({body})=>{
-                expect(body.msg).toBe("Invalid query params!!")
+                expect(body.msg).toBe("Sorry can't find that!!")
             })
     })
     test("get status code 400 if query is incorrect type",()=>{
@@ -250,16 +250,16 @@ describe("PATCH /api/articles/:article_id",()=>{
                 expect(msg).toBe("Invalid query type!!")
             })
     })
-    test("get status code 400, when article_id is correct type but invalid range",()=>{
+    test("get status code 404, when article_id is correct type but invalid range",()=>{
         const newVote = 10
         const patch = {inc_votes: newVote}
         return request(app)
         .patch("/api/articles/100")
         .send(patch)
-        .expect(400)
+        .expect(404)
             .then(({body})=>{
                 const {msg} = body
-                expect(msg).toBe("Invalid range for article_id!!")
+                expect(msg).toBe("Sorry can't find that!!")
             })
     })
     test("get status code 400, when article_id is the incorrect type",()=>{
@@ -297,6 +297,21 @@ describe("DELETE /api/comments/:comment_id",()=>{
             .then(({body})=>{
                 const {msg} = body
                 expect(msg).toBe("Invalid query type!!")
+            })
+    })
+})
+describe("GET /api/users",()=>{
+    test("get status code 200, and return an array of object with the keys of username, name and avatar_url",()=>{
+        return request(app)
+        .get("/api/users")
+        .expect(200)
+            .then(({body})=>{
+                const {users} = body
+                expect(users.length).toBeGreaterThan(0)
+                users.forEach((user)=>{
+                    expect(Object.keys(user)).toMatchObject(["username","name","avatar_url"])
+                    expect(user).toMatchObject({"username": expect.any(String),"name":expect.any(String),"avatar_url":expect.any(String)})
+                })
             })
     })
 })
