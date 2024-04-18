@@ -40,10 +40,15 @@ exports.getArticles = (req,res,next) =>{
 
 exports.getAllArticles = (req,res,next) =>{
 
-    selectAllArticles().then(({rows})=>{
+    const query = req.query
+
+    selectAllArticles(query).then(({rows})=>{
+        if(rows.length===0){throw err}
         rows.forEach((article)=>{article.comment_count=Number(article.comment_count)})
+
         return res.status(200).send({articles:rows})
-    })
+    }).catch((err)=>
+        {next(err)})
 }
 
 exports.getComments = (req,res,next) =>{
