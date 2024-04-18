@@ -29,8 +29,8 @@ exports.getArticles = (req,res,next) =>{
     const articleId = req.params.article_id
 
     selectSpecifiedArticle(articleId).then(({rows})=>{
+
         if(rows.length===0){throw err}
-        
         return res.status(200).send({article:rows[0]})
     
     }).catch((err)=>{

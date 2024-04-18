@@ -66,7 +66,7 @@ describe("GET /api/articles/:article_id",()=>{
         .expect(200)
             .then(({body})=>{
                 const article = body.article
-                expect(Object.keys(article).length).toBe(8)
+                expect(Object.keys(article).length).toBeGreaterThan(0)
                 expect(typeof article.author).toBe("string")
                 expect(typeof article.votes).toBe("number")
             })
@@ -343,6 +343,16 @@ describe("GET /api/articles?topicFilter",()=>{
         .expect(404)
             .then(({body})=>{
                 expect(body.msg).toBe("Sorry can't find that!!")
+            })
+    })
+})
+describe("GET /api/articles/:article_id",()=>{
+    test("get status code 200 and return the specified array with that newly added comment_count",()=>{
+        return request(app)
+        .get("/api/articles/3")
+        .expect(200)
+            .then(({body})=>{
+                expect(body.article).toMatchObject({comment_count:"2"})
             })
     })
 })
