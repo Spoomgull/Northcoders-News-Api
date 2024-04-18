@@ -2,7 +2,7 @@ const express = require("express")
 
 const app = express()
 
-const {getTopics, getEndpoints, getArticles, getAllArticles, getComments, postComment, patchArticle, deleteComment} = require("./controller")
+const {getTopics, getEndpoints, getArticles, getAllArticles, getComments, postComment, patchArticle, deleteComment,getUsers} = require("./controller")
 
 app.use(express.json())
 
@@ -22,6 +22,8 @@ app.patch("/api/articles/:article_id",patchArticle)
 
 app.delete("/api/comments/:comment_id",deleteComment)
 
+app.get("/api/users",getUsers)
+
 
 
 app.use((err, req, res, next) => {
@@ -33,7 +35,8 @@ app.use((err,req,res,nest) => {
   next(err)
 })
 app.use((err,req,res,next)=>{
-  return res.status(400).send({msg:"Invalid query params!!"})
+  if(err.code===""){return res.status(400).send({msg:"Invalid query params!!"})}
+  else{next()}
 })
 
 
