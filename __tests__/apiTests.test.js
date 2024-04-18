@@ -84,7 +84,7 @@ describe("GET /api/articles/:article_id",()=>{
         .get("/api/articles/John")
         .expect(400)
             .then(({body})=>{
-                expect(body.msg).toBe("Invalid query params!!")
+                expect(body.msg).toBe("Invalid query type!!")
 
         })
     })
@@ -161,7 +161,7 @@ describe("GET /api/articles/:article_id/comments",()=>{
         .get("/api/articles/John/comments")
         .expect(400)
             .then(({body})=>{
-                expect(body.msg).toBe("Invalid query params!!")
+                expect(body.msg).toBe("Invalid query type!!")
             })
     })
 })
@@ -247,7 +247,7 @@ describe("PATCH /api/articles/:article_id",()=>{
         .expect(400)
             .then(({body})=>{
                 const {msg} = body
-                expect(msg).toBe("Invalid query params!!")
+                expect(msg).toBe("Invalid query type!!")
             })
     })
     test("get status code 400, when article_id is correct type but invalid range",()=>{
@@ -271,7 +271,32 @@ describe("PATCH /api/articles/:article_id",()=>{
         .expect(400)
             .then(({body})=>{
                 const {msg} = body
-                expect(msg).toBe
+                expect(msg).toBe("Invalid query type!!")
+            })
+    })
+})
+describe("DELETE /api/comments/:comment_id",()=>{
+    test("get status code 204, and return no content",()=>{
+        return request(app)
+        .delete("/api/comments/7")
+        .expect(204)
+    })
+    test("get status code 404 when comment_id is correct type but invalid range",()=>{
+        return request(app)
+        .delete("/api/comments/200")
+        .expect(404)
+            .then(({body})=>{
+                const {msg} = body
+                expect(msg).toBe("Sorry can't find that!!")
+            })
+    })
+    test("get status code 400 when comment_id is incorrect type",()=>{
+        return request(app)
+        .delete("/api/comments/John")
+        .expect(400)
+            .then(({body})=>{
+                const {msg} = body
+                expect(msg).toBe("Invalid query type!!")
             })
     })
 })
