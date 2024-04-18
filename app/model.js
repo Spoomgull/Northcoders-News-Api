@@ -1,3 +1,4 @@
+const { Console } = require("console")
 const db = require("../db/connection.js")
 const fs = require("fs/promises")
 
@@ -16,8 +17,18 @@ exports.selectSpecifiedArticle = (id)=>{
     return db.query(`SELECT * FROM articles WHERE article_id = $1`,[id])
 }
 
-exports.selectAllArticles = ()=>{    
-    return db.query(`SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, article_img_url, count(*) AS comment_count FROM articles JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC`)
+exports.selectAllArticles = (query)=>{    
+    let querystr = `SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, article_img_url, count(*) AS comment_count FROM articles
+     JOIN comments ON comments.article_id = articles.article_id `
+
+    const queryVar = []
+    if(Object.keys(query).length>0){
+        if(query.topicFilter===undefined){throw err}
+        queryVar.push(query.topicFilter)
+        querystr+= `WHERE topic = $${queryVar.length} `
+    }
+    querystr+= `GROUP BY articles.article_id ORDER BY articles.created_at DESC`
+    return db.query(querystr,queryVar)
 }
 
 exports.selectSpecifiedComments = (id)=>{

@@ -99,6 +99,7 @@ describe("GET /api/articles",()=>{
                 const articles=body.articles
                 expect(typeof articles).toBe("object")
                 expect(articles).toBeSortedBy("created_at",{descending: true})
+                expect(articles.length).toBeGreaterThan(0)
                 articles.forEach((article)=>{
                     expect(Object.keys(article)).toEqual(["article_id","title","topic","author","created_at","votes","article_img_url","comment_count"])
                     expect(typeof article.author).toBe("string")
@@ -312,6 +313,36 @@ describe("GET /api/users",()=>{
                     expect(Object.keys(user)).toMatchObject(["username","name","avatar_url"])
                     expect(user).toMatchObject({"username": expect.any(String),"name":expect.any(String),"avatar_url":expect.any(String)})
                 })
+            })
+    })
+})
+describe("GET /api/articles?topicFilter",()=>{
+    test("get status code 200, and return all the articles with the specific topic filter",()=>{
+        return request(app)
+        .get("/api/articles?topicFilter=mitch")
+        .expect(200)
+            .then(({body})=>{
+                const {articles} = body
+                expect(articles.length).toBeGreaterThan(0)
+                articles.forEach((article)=>{
+                    expect(article.topic).toBe("mitch")
+                })
+            })
+    })
+    test("get status code 400 if there are no topics with the topicFilter value",()=>{
+        return request(app)
+        .get("/api/articles?topicFilter=paper")
+        .expect(404)
+            .then(({body})=>{
+                expect(body.msg).toBe("Sorry can't find that!!")
+            })
+    })
+    test("get status code 404 if the filter has the wrong name",()=>{
+        return request(app)
+        .get("/api/articles?tipocFeltir=mitch")
+        .expect(404)
+            .then(({body})=>{
+                expect(body.msg).toBe("Sorry can't find that!!")
             })
     })
 })
