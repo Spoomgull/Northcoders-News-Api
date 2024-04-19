@@ -3,6 +3,7 @@ const app = require("../app/app.js")
 const db = require("../db/connection.js")
 const seed = require("../db/seeds/seed.js")
 const data = require("../db/data/test-data/index.js")
+const articles = require("../db/data/test-data/articles.js")
 require("jest-sorted")
 
 
@@ -33,12 +34,11 @@ describe("GET /api/topics",()=>{
                 .then(({body})=>{
                     const topics = body.topics
 
-                    expect(topics).toEqual(data.topicData)
+                    expect(topics).toMatchObject(data.topicData)
                     expect(topics.length).toBe(data.topicData.length)
-                    expect(topics.length).toBeGreaterThan(0)
              
                     topics.forEach((topic)=>{
-                        expect(Object.keys(topic)).toEqual(['slug','description'])
+                        expect(topic).toMatchObject({slug:expect.any(String),description:expect.any(String)})
                     })
 
                 })
@@ -51,10 +51,9 @@ describe("GET /api",()=>{
             .get("/api")
             .expect(200)
                 .then(({body})=>{
+                    const endpointFile = require("../endpoints.json")
                     const endpoints = body.endpoints
-                    expect(endpoints["GET /api"]).toEqual({description: 'serves up a json representation of all the available endpoints of the api'})
-                    expect(endpoints["GET /api/topics"]).toMatchObject({"description": "serves an array of all topics", "exampleResponse": {"topics": [{"description": "Footie!", "slug": "football"}]}, "queries": []})
-                    expect(endpoints["GET /api/articles"]).toMatchObject({"description": "serves an array of all articles", "exampleResponse": {"articles": [{"author": "weegembump", "comment_count": 6, "created_at": "2018-05-30T15:59:13.341Z", "title": "Seafood substitutions are increasing", "topic": "cooking", "votes": 0}]}, "queries": ["author", "topic", "sort_by", "order"]})
+                    expect(endpoints).toMatchObject(endpointFile)
                 })
     })
 })
@@ -67,8 +66,13 @@ describe("GET /api/articles/:article_id",()=>{
             .then(({body})=>{
                 const article = body.article
                 expect(Object.keys(article).length).toBeGreaterThan(0)
-                expect(typeof article.author).toBe("string")
-                expect(typeof article.votes).toBe("number")
+                expect(article).toMatchObject({
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                article_img_url:expect.any(String)})
             })
     })
     test("get status code 404 if query is correct type but invalid range",()=>{
@@ -101,12 +105,8 @@ describe("GET /api/articles",()=>{
                 expect(articles).toBeSortedBy("created_at",{descending: true})
                 expect(articles.length).toBeGreaterThan(0)
                 articles.forEach((article)=>{
-                    expect(Object.keys(article)).toEqual(["article_id","title","topic","author","created_at","votes","article_img_url","comment_count"])
-                    expect(typeof article.author).toBe("string")
-                    expect(typeof article.votes).toBe("number")
-                    expect(article.body).toBe(undefined)
+                    expect(article).toMatchObject({article_id:expect.any(Number),title:expect.any(String),topic:expect.any(String),author:expect.any(String),created_at:expect.any(String),votes:expect.any(Number),article_img_url:expect.any(String),comment_count:expect.any(Number)})
                     expect(Object.keys(article).length).toBe(8)
-                    expect(typeof article.comment_count).toBe("number")
                 })
         })
     })
@@ -308,10 +308,9 @@ describe("GET /api/users",()=>{
         .expect(200)
             .then(({body})=>{
                 const {users} = body
-                expect(users.length).toBeGreaterThan(0)
+                expect(users.length).toBe(data.userData.length)
                 users.forEach((user)=>{
-                    expect(Object.keys(user)).toMatchObject(["username","name","avatar_url"])
-                    expect(user).toMatchObject({"username": expect.any(String),"name":expect.any(String),"avatar_url":expect.any(String)})
+                    expect(user).toMatchObject({username: expect.any(String),name:expect.any(String),avatar_url:expect.any(String)})
                 })
             })
     })
@@ -323,7 +322,7 @@ describe("GET /api/articles?topicFilter",()=>{
         .expect(200)
             .then(({body})=>{
                 const {articles} = body
-                expect(articles.length).toBeGreaterThan(0)
+                expect(articles.length).toBe(4)
                 articles.forEach((article)=>{
                     expect(article.topic).toBe("mitch")
                 })
