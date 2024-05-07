@@ -6,9 +6,7 @@ const {selectAllTopics, readEndpoints, selectSpecifiedArticle, selectAllArticles
 
 exports.getTopics = (req,res,next) =>{
 
-
     selectAllTopics().then(({rows})=>{
-  
   
         return res.status(200).send({topics:rows})
     })
@@ -24,13 +22,13 @@ exports.getEndpoints = (req,res,next) =>{
     })
 }
 
-exports.getArticles = (req,res,next) =>{
+exports.getArticleById = (req,res,next) =>{
 
     const articleId = req.params.article_id
 
     selectSpecifiedArticle(articleId).then(({rows})=>{
 
-        if(rows.length===0){throw err}
+        if(rows.length===0){throw new("error 404: not found")}
         return res.status(200).send({article:rows[0]})
     
     }).catch((err)=>{
@@ -43,7 +41,7 @@ exports.getAllArticles = (req,res,next) =>{
     const query = req.query
 
     selectAllArticles(query).then(({rows})=>{
-        if(rows.length===0){throw err}
+        if(rows.length===0){throw err = {msg:"correct type but no articles"}}
         rows.forEach((article)=>{article.comment_count=Number(article.comment_count)})
 
         return res.status(200).send({articles:rows})

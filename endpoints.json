@@ -28,7 +28,7 @@
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves an array of specified article",
+    "description": "serves a specified article object",
     "queries": ["number"],
     "exampleResponse": {
       "article": {
